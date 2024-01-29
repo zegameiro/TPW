@@ -1,0 +1,54 @@
+<app-error-display [error_messages]="submit_errors"></app-error-display>
+<div class="">
+  <section id="add_edit_Album">
+    <ng-template #musicAction>{{ id ? 'Edit Song' : 'Add Song' }}</ng-template>
+
+    <h1 class="margin"><ng-container *ngTemplateOutlet="musicAction"></ng-container></h1>
+    <form [formGroup]="addMusicForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+      <hr />
+      <div class="form-group mt-[20px]">
+        <label>Name</label>
+        <br />
+        <input type="text" placeholder="Type here" class="input w-full max-w-3xl mb-[30px] mt-[3px]"  formControlName="name"/>
+        <br />
+        <label>Genre</label>
+        <br />
+        <select class="select w-full max-w-lg mb-[30px]" formControlName="genre">
+          <option *ngFor="let genre of genres" [value]="genre.id" class="text-lg">{{ genre.title }}</option>
+        </select>
+        <br />
+        <label>Performer</label>
+        <br />
+        <select class="select w-full max-w-lg mb-[30px]" formControlName="performer" (change)="onPerformerSelect()">
+          <option *ngFor="let performer of performers" [value]="performer.id" class="text-lg">{{ performer.name }}</option>
+        </select>
+        <br />
+        <label>Album</label>
+        <br />
+        <select class="select w-full max-w-lg mb-[30px]" formControlName="album">
+          <option *ngFor="let album of albums" [value]="album.id" class="text-lg">{{ album.name }}</option>
+        </select>
+        <br />
+        <label>Image</label>
+        <br />
+        <input type="file" accept=".jpg, .jpeg, .png, .svg" class="file-input file-input-bordered w-full max-w-lg mb-[30px]" (change)="onFileChange($event)"/>
+        <div role="alert" class="alert alert-error" *ngIf="addMusicForm.get('image')?.errors?.['invalidFileType']">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span>ERROR! Invalid Type of file. You should submit a .jpeg, .jpg or .png file!</span>
+        </div>
+        <br />
+        <label>Music</label>
+        <br />
+        <input type="file" accept=".mp3,.wav" class="file-input file-input-bordered w-full max-w-lg mb-[30px]" (change)="onMusicFileChange($event)"/>
+        <div role="alert" class="alert alert-error" *ngIf="addMusicForm.get('audio_file')?.errors?.['invalidFileType']">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span>ERROR! Invalid Type of file. You should submit a .mp3 ou .wav file!</span>
+        </div>
+        <br />
+      </div>
+      <div class="pt-5">
+        <button class="btn btn-primary" type="submit"><ng-container *ngTemplateOutlet="musicAction"></ng-container></button>
+      </div>
+    </form>
+  </section>
+</div>

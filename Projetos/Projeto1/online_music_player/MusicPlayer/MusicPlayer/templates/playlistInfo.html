@@ -1,0 +1,212 @@
+{% extends "layout.html" %} {% block content %} {% load static %} {% load i18n%}
+
+<div class="overflow-x-auto">
+  <table class="table">
+    <h1>{{playlist.name}}</h1>
+    <hr />
+    <thead>
+      <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="sortable">
+      <!-- row 1 -->
+      {% for m in memberships %}
+      {% with music=m.music %}
+      <tr class="songitemPlaylist" style="font-size: larger">
+        <th style="text-align: center">
+          <button class="songlistplay">
+            <i
+              id="1"
+              class="far songItemPlay fa-play-circle"
+              data-song-url="{{ music.audio_file.url }}"
+            ></i>
+          </button>
+        </th>
+        <td>
+          <div class="flex items-center">
+            <div class="avatar">
+              <div class="mask mask-squircle">
+                <img src="{{ music.image.url }}" style="max-width: 150px" />
+              </div>
+            </div>
+          </div>
+        </td>
+        <td>
+          {% if user in music.likes.all %}
+              <button class="like-button" onclick="toggleLike(event, '{{ music.id }}', '{{ user.id }}')">
+                <i class="heart-icon fas fa-heart" style="color: #c061cb;"></i>
+              </button>
+              <span id="likes-count-{{ music.id }}">  {{ music.total_likes }} </span>
+            
+            {% else %}
+              <button class="like-button" onclick="toggleLike(event, '{{ music.id }}', '{{ user.id }}')">
+                <i class="heart-icon far fa-heart" style="color: #c061cb;"></i>
+              </button>
+              <span id="likes-count-{{ music.id }}">  {{ music.total_likes }}</span>
+            {% endif %}
+        </td>
+        <td>
+          <div class="songName">{{ music.name }}</div>
+          <br />
+          <span class="badge badge-ghost badge-sm songPerformer">
+            <a href="{% url 'artist_info' music.performer.name %}">{{ music.performer.name }}</a>
+          </span>
+        </td>
+        <td>{{ m.added_date }}</td>
+        <td>{{ music.genre }}</td>
+        <th>
+          <button
+            class="badge badge-outline btn-error"
+            onclick="showModal(this)"
+            data-song-name="{{ music.name }}"
+            data-song-id="{{ music.id }}"
+          >
+            <i class="fa fa-trash-o"></i>
+          </button>
+        </th>
+      </tr>
+      {% endwith %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<div class="bottom_tp margin">
+  <input type="range" name="range" id="ProgressBar" min="0" max="100" />
+  <div class="songinfo-container_tp">
+    <div class="songinfo_tp">
+      <img
+        src="{% static 'images/playing.gif' %}"
+        width="45px"
+        alt=""
+        id="gif"
+      />
+      <span id="masterSongName"></span>
+    </div>
+    <div class="icon">
+      <i class="fas fa-2x fa-step-backward" id="previous"></i>
+      <i class="far fa-2x fa-play-circle" id="masterPlay"></i>
+      <i class="fas fa-2x fa-step-forward" id="next"></i>
+    </div>
+  </div>
+</div>
+
+<dialog id="modalDelete" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Remove song from playlist!</h3>
+    <p class="py-4"></p>
+    <div class="modal-action">
+      <input type="hidden" id="globalId" value="" />
+      <a class="btn btn-error" id="deleteLink">Yes</a>
+      <button
+        class="btn"
+        onclick="document.getElementById('modalDelete').close()"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</dialog>
+<script src="{% static 'scripts/script.js' %}"></script>
+<!-- Jquery -->
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<script>
+  let globalName;
+  let globalId;
+  let playlistId;
+
+  window.showModal = function (button) {
+    globalName = button.getAttribute("data-song-name");
+    globalId = button.getAttribute("data-song-id");
+    document.getElementById("globalId").value = globalId;
+    var modalText = document.querySelector("#modalDelete p");
+    var modalDelete = document.querySelector("#modalDelete");
+    modalText.innerHTML =
+      "{% translate 'Are you sure you want to remove from the playlist the following song: ' %}<b>" +
+      globalName +
+      "</b>?";
+    document.getElementById("deleteLink").href =
+      "deleteSongPlaylist/" + document.getElementById("globalId").value;
+
+    modalDelete.showModal();
+  };
+  function toggleLike(event, musicId, userId) {
+    var $icon = $(event.currentTarget).find(".heart-icon");
+    var $likesCount = $(event.currentTarget).next();
+    var isLiked = $icon.hasClass("fas");
+
+    $.ajax({
+        url: isLiked ? '{% url "removeLike" %}' : '{% url "addLike" %}',
+        data: {
+            csrfmiddlewaretoken: "{{ csrf_token }}",
+            music_id: musicId,
+        },
+        method: "POST",
+        success: function (response) {
+            if (response.success === true) {
+                if (isLiked) {
+                    $icon.removeClass("fas");
+                    $icon.addClass("far");
+                } else {
+                    $icon.removeClass("far");
+                    $icon.addClass("fas");
+                }
+                $likesCount.text(response.likes);
+                $icon.addClass("animated-heart");
+
+                setTimeout(function () {
+                    $icon.removeClass("animated-heart");
+                }, 1000);
+            }
+        },
+    });
+  }
+  // SORTABLE
+  $( function() {
+      let s,from,to;
+      let isDraggeable = true;
+      s = $( "#sortable" );
+      s.sortable({revert: true});
+      s.on("sortstart",function(event,ui){
+          from = ui.item.index();
+      });
+      $('#sortable').on('sortdeactivate',function(event,ui) {
+          to = ui.item.index();
+          // disable draggeable until getting response from server
+          $.ajax({
+            url: '{% url "sortPlaylist" %}',
+            data: {
+                csrfmiddlewaretoken: "{{ csrf_token }}",
+                prev_position: from,
+                next_position: to,
+                playlist_id: {{ memberships.0.playlist.id }}
+            },
+          method: "POST",
+          success: function (response) {
+                console.log(response.success);
+                if (response.success === false){
+                    s.sortable('cancel');
+                }
+          },
+          error: function (){
+                s.sortable('cancel');
+          }
+        });
+      });
+      
+  } );
+</script>
+
+{% endblock %}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Music Streaming</title>
+
+    {% load static %} {% load i18n %}
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@3.9.3/dist/full.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/Home.css' %}" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/Navbar.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      media="screen and (max-width: 1100px)"
+      href="{% static 'css/responsive.css' %}"
+    />
+  </head>
+
+  <body>
+    <nav class="navbar_tp">
+      <ul class="navbar-nav_tp">
+        <li class="logo_tp">
+          <a class="nav-link_tp" href="{% url 'home' %}">
+            <img src="{% static 'images/logo.png' %}" />
+            <span class="link-text_tp">Music Streaming</span>
+          </a>
+        </li>
+        <li class="nav-item_tp">
+          <a class="nav-link_tp" href="{% url 'home' %}">
+            <img src="{% static 'images/home.jpeg' %}" alt="Home" />
+            <span class="link-text_tp">Home</span>
+          </a>
+        </li>
+        <li class="nav-item_tp">
+          <a class="nav-link_tp" href="{% url 'about' %}">
+            <img src="{% static 'images/aboutus.jpeg' %}" alt="About us" />
+            <span class="link-text_tp">{% translate 'About us' %}</span>
+          </a>
+        </li>
+        <li class="nav-item_tp">
+          <a class="nav-link_tp" href="{% url 'playlists' %}">
+            <img src="{% static 'images/headphones.jpeg' %}" alt="Playlists" />
+            <span class="link-text_tp">Playlists</span>
+          </a>
+        </li>
+        <li class="nav-item_tp">
+          <a class="nav-link_tp" href="{% url 'songQueue' %}">
+            <img src="{% static 'images/playlist.jpg' %}" alt="Song Queue" />
+            <span class="link-text_tp">{% translate 'Song Queue' %}</span>
+          </a>
+        </li>
+        {% if user.is_authenticated and user.is_superuser %}
+        <li class="nav-item_tp">
+          <a class="nav-link_tp" href="{% url 'adminPanel' %}">
+            <img
+              src="{% static 'images/admin.png' %}"
+              alt="Administrator Panel"
+            />
+            <span class="link-text_tp"
+              >{% translate 'Administrator Panel'%}</span
+            >
+          </a>
+        </li>
+        {% endif %} {% if user.is_authenticated %}
+        <li class="nav-item_tp">
+          <a class="nav-link_tp" href="{% url 'logout' %}">
+            <img src="{% static 'images/user.jpeg' %}" alt="Log Out" />
+            <span class="link-text_tp">{% translate 'Log Out' %}</span>
+          </a>
+        </li>
+        {% else %}
+        <li class="nav-item_tp">
+          <a class="nav-link_tp" href="{% url 'login_signup' %}">
+            <img src="{% static 'images/user.jpeg' %}" alt="Rating & Review" />
+            <span class="link-text_tp">{% translate 'Log In' %}</span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+
+    <main>
+      <div class="">
+        <p></p>
+        {% block content %} {% endblock %}
+      </div>
+    </main>
+    <script
+      src="https://kit.fontawesome.com/d5b2540b36.js"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

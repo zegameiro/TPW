@@ -1,0 +1,314 @@
+﻿{% extends "layout.html" %} {% block content %} {% load static %} {% load i18n %}
+<script src="{% static 'scripts/jquery-3.4.1.min.js' %}"></script>
+<div class="header_tp flex flex-row justify-between items-center">
+  <h1 class="margin">{% translate 'Welcome to our Music Streaming Web App'%}</h1>
+  {% load crispy_forms_tags %}
+  <form class="search-container" method="post">
+    {% csrf_token %} {{ formSearch|crispy }}
+    <button class="btn btn-outline" type="submit">Search</button>
+  </form>
+</div>
+<div style="position: relative">
+  <div
+    class="alert alert-success"
+    id="successMessages"
+    style="opacity: 0; position: absolute"
+  >
+    <span>{% translate "Your Music Has Been Added to the Queue!" %}</span>
+  </div>
+  <div
+    class="alert alert-success"
+    id="successAddplaylist"
+    style="opacity: 0; position: absolute"
+  >
+    <span>{% translate "Your Music Has Been Added to the Playlist!"%}</span>
+  </div>
+</div>
+<!-- SONGS GROUPED BY GENRES -->
+{% for genre, songs in songs_by_genre %}
+<h2 class="margin">{{ genre }}</h2>
+<hr />
+<div class="container_tp margin">
+  {% for song in songs %}
+  <div class="card_tp bg-base-100 shadow-xl">
+    <div class="songlist_tp">
+      <div class="songitem_tp image-full">
+        <img class="image_tp" src="{{ song.image.url }}" alt="1" />
+        <span class="songName card-title"> {{ song.name }}</span>
+        <span class="songPerformer m-5">
+          <a href="{% url 'artist_info' song.performer.name %}">{{ song.performer.name }}</a>
+        </span>
+        <div class="card-actions justify-end">
+          <button class="songlistplay">
+            <i
+              id="1"
+              class="far songItemPlay fa-play-circle"
+              data-song-url="{{ song.audio_file.url }}"
+            ></i>
+          </button>
+          {% if user.is_authenticated %}
+            <button class="addToQueue" onclick="addMusicToQueue('{{ song.id }}')">
+              <i class="fa fa-cloud-download"></i>
+            </button>
+            <button class="addToPlaylist" onclick="showModal('{{ song.id }}')">
+              <i class="fa fa-plus-square-o"></i>      
+            </button>
+            {% if user in song.likes.all %}
+              <button class="like-button" onclick="toggleLike(event, '{{ song.id }}', '{{ user.id }}')">
+                <i class="heart-icon fas fa-heart" style="color: #c061cb;"></i>
+              </button>
+              <span id="likes-count-{{ song.id }}">  {{ song.total_likes }} </span>
+            {% else %}
+              <button class="like-button" onclick="toggleLike(event, '{{ song.id }}', '{{ user.id }}')">
+                <i class="heart-icon far fa-heart" style="color: #c061cb;"></i>
+              </button>
+              <span id="likes-count-{{ song.id }}">  {{ song.total_likes }}</span>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endfor %}
+{% if not songs_by_genre %}
+    <h2 class="margin">{% translate 'No results found...' %}</h2>
+{% endif %}
+<div  class="" style="margin-left: 93%;">
+  {% if songs_by_genre.paginator %}
+      <div class=" style="margin-top: 25px">
+          <div class="join">
+              {% for p in songs_by_genre.paginator.page_range %}
+                  {% if p == songs_by_genre.number %}
+                      <button class="join-item btn btn-active" onclick="location.href='/?page={{ p }}'">{{ p }}</button>
+                  {% else %}
+                      <button class="join-item btn" onclick="location.href='/?page={{ p }}'">{{ p }}</button>
+                  {% endif %}
+              {% endfor %}
+          </div>
+      </div>
+  {% endif %}
+</div>
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+
+<div class="bottom_tp margin">
+  <input type="range" name="range" id="ProgressBar" min="0" max="100" />
+  <div class="songinfo-container_tp">
+    <div class="songinfo_tp">
+      <img
+        src="{% static 'images/playing.gif' %}"
+        width="45px"
+        alt=""
+        id="gif"
+      />
+      <span id="masterSongName"></span>
+    </div>
+    <div class="icon">
+      <button>
+        <i class="fas fa-2x fa-step-backward" id="previous"></i>
+        <i class="far fa-2x fa-play-circle" id="masterPlay"></i>
+        <i class="fas fa-2x fa-step-forward" id="next"></i>
+      </button>
+    </div>
+  </div>
+</div>
+{% if user.is_authenticated %}
+<dialog id="addToPlaylist_modal" class="modal">
+  <div class="modal-box w-11/12 max-w-5xl">
+    <h3 class="font-bold text-lg">Playlists</h3>
+    <hr />
+    <div style="max-height: 400px; overflow-y: auto">
+      <table class="table ml-0" id="playlistMusics">
+        <!-- head -->
+        <thead>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for playlist in playlists %}
+          <tr>
+            <th>{{playlist.id}}</th>
+            <th>{{playlist.name}}</th>
+            <td>
+              <button onclick="addToPlaylist('{{ playlist.id }}')">
+                <i class="fa fa-plus-square-o"></i>
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-action">
+      <button
+        class="btn btn-active btn-primary"
+        onclick="addToPlaylist_modal.close(); newPlaylistModal.showModal()"
+      >
+        New playlist
+      </button>
+      <form method="dialog">
+        <button class="btn">Close</button>
+      </form>
+    </div>
+  </div>
+</dialog>
+<dialog id="newPlaylistModal" class="modal modal-bottom sm:modal-middle">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Add New Playlist</h3>
+    <hr />
+    {% load crispy_forms_tags %}
+    <form onsubmit="return false;">
+      {% csrf_token %} {{ formPlaylist|crispy }}
+      <input type="hidden" name="song_id" value="{{ song_id }}" />
+      <input
+        type="submit"
+        value="Submit"
+        class="btn btn-active btn-primary"
+        onclick="addPlaylist()"
+        style="position: absolute; margin-top: 25px; margin-left: 290px"
+      />
+    </form>
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn">Close</button>
+      </form>
+    </div>
+  </div>
+</dialog>
+{% endif %}
+<script src="{% static 'scripts/script.js' %}"></script>
+<script>
+  var globalSongId;
+  function showModal(song_id) {
+    globalSongId = song_id;
+    var songIdInput = document.querySelector('input[name="song_id"]');
+    console.log("song la", globalSongId);
+    if (globalSongId) {
+      songIdInput.value = globalSongId;
+    }
+    addToPlaylist_modal.showModal();
+  }
+
+  // AJAX call to django
+  function addMusicToQueue(music_id) {
+    $.ajax({
+      url: '{% url "addMusicToQueue" %}',
+      data: {
+        csrfmiddlewaretoken: "{{ csrf_token }}",
+        music_id: music_id,
+      },
+      method: "POST",
+      success: function (response) {
+        if (response.success === true) {
+          let successMessages = $("#successMessages");
+          successMessages.animate({ opacity: 1 });
+          setTimeout(function () {
+            successMessages.animate({ opacity: 0 });
+          }, 2000);
+        }
+      },
+    });
+  }
+  function addToPlaylist(playlist_id) {
+    $.ajax({
+      url: '{% url "addToPlaylist" %}',
+      data: {
+        csrfmiddlewaretoken: "{{ csrf_token }}",
+        playlist_id: playlist_id,
+        song_id: globalSongId,
+      },
+      method: "POST",
+      success: function (response) {
+        if (response.success === true) {
+          let successMessages = $("#successAddplaylist");
+          successMessages.animate({ opacity: 1 });
+          setTimeout(function () {
+            successMessages.animate({ opacity: 0 });
+          }, 2000);
+          addToPlaylist_modal.close();
+        }
+      },
+    });
+  }
+  function addPlaylist() {
+    let playlistName = document.getElementById("id_name").value.trim();
+    if (playlistName.length > 0) {
+      $.ajax({
+        url: '{% url "addPlaylist" %}',
+        data: {
+          csrfmiddlewaretoken: "{{ csrf_token }}",
+          playlistName: playlistName,
+        },
+        method: "POST",
+        success: function (response) {
+          if (response.success === true) {
+            let newPlaylist = response.playlist;
+            newPlaylistModal.close();
+            // erase content of input
+            document.getElementById("id_name").value = "";
+            // add new playlist manually
+            let table = document
+              .getElementById("playlistMusics")
+              .getElementsByTagName("tbody")[0];
+            let newrow = table.insertRow(table.rows.length);
+            let num = newrow.insertCell(0);
+            let name = newrow.insertCell(1);
+            let add = newrow.insertCell(2);
+            num.outerHTML = `<th>${table.rows.length.toString()}</th>`;
+            name.outerHTML = `<th>${playlistName}</th>`;
+            let addButton = document.createElement("button");
+            addButton.innerHTML = '<i class="fa fa-plus-square-o"></i>';
+            console.log("carreguei");
+            addButton.onclick = function () {
+              addToPlaylist(newPlaylist.id);
+            };
+            add.appendChild(addButton);
+            addToPlaylist_modal.showModal();
+          }
+        },
+      });
+    }
+  }
+  function toggleLike(event, musicId, userId) {
+    var $icon = $(event.currentTarget).find(".heart-icon");
+    var $likesCount = $(event.currentTarget).next();
+    var isLiked = $icon.hasClass("fas");
+
+    $.ajax({
+        url: isLiked ? '{% url "removeLike" %}' : '{% url "addLike" %}',
+        data: {
+            csrfmiddlewaretoken: "{{ csrf_token }}",
+            music_id: musicId,
+        },
+        method: "POST",
+        success: function (response) {
+            if (response.success === true) {
+                if (isLiked) {
+                    $icon.removeClass("fas");
+                    $icon.addClass("far");
+                } else {
+                    $icon.removeClass("far");
+                    $icon.addClass("fas");
+                }
+                $likesCount.text(response.likes);
+                $icon.addClass("animated-heart");
+
+                setTimeout(function () {
+                    $icon.removeClass("animated-heart");
+                }, 1000);
+            }
+        },
+    });
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,47 @@
+<h1 class="margin ">List of Artists</h1>
+<hr />
+<div class="container_tp">
+  <div class="card w-96 bg-base-100 shadow-xl m-5" *ngFor="let artist of artists">
+    <div >
+      <figure *ngIf="artist.image">
+        <img [src]="BACKEND_URL + artist.image" class="object-right-top object-cover h-60 w-full rounded-tr-xl rounded-tl-xl"  alt="1" />
+      </figure>
+    </div>
+    <div class=" card-body w-96">
+      <span class="card-title"><a routerLink="/artistDetails/{{ artist.id }}">{{ artist.name }}</a></span>
+      <div class="card-actions justify-end ">
+        <a class="btn btn-outline mr-2" routerLink="/editArtist/{{ artist.id }}"
+        >Edit</a
+        >
+        <button
+          class="btn btn-outline btn-error"
+          onclick="document.getElementById('modalDelete').show()"
+          (click)="currentArtistName = artist.name; currentArtistId = artist.id"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<dialog id="modalDelete" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Delete Artist!</h3>
+    <p class="py-4">
+      Are you sure you want to delete the artist <b>{{currentArtistName}}</b>?
+    </p>
+    <p>This action cannot be undone.</p>
+    <div class="modal-action">
+      <input type="hidden" id="globalId" value="" />
+      <a class="btn btn-error" id="deleteLink" (click)="deleteArtist(currentArtistId)">Yes</a>
+      <button
+        id="closeModal"
+        class="btn"
+        onclick="document.getElementById('modalDelete').close();"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</dialog>

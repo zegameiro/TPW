@@ -1,0 +1,53 @@
+<h1 class="margin">Playlists</h1>
+<hr />
+<div class="overflow-x-auto">
+  <table class="table mt-1">
+    <thead>
+      <tr class="text-xl bg-base-100 text-slate-50">
+        <th></th>
+        <th>Name</th>
+        <th>User</th>
+        <th>Quantity</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody class="text-lg">
+    <tr class="hover cursor-pointer" *ngFor="let playlist of playlists;let i = index;" (click)="goToDetails(playlist.id)">
+      <th>{{i + 1}}</th>
+      <td>{{playlist.name}}</td>
+      <td>{{playlist.author}}</td>
+      <td>{{playlist.musics.length}}</td>
+      <td>
+        <button
+          class="btn btn-outline btn-error"
+          onclick="document.getElementById('modalDelete').show(); event.stopPropagation();"
+          (click)="currentPlaylistName = playlist.name; currentPlaylistId = playlist.id"
+        >
+          <i class="fa fa-trash-o text-lg"></i>
+        </button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<dialog id="modalDelete" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Delete Playlist!</h3>
+    <p class="py-4">
+      Are you sure you want to delete the playlist <b>{{currentPlaylistName}} </b>?
+    </p>
+    <p>This action cannot be undone.</p>
+    <div class="modal-action">
+      <input type="hidden" id="globalId" value="" />
+      <a class="btn btn-error" id="deleteLink" (click)="deletePlaylist(currentPlaylistId)">Yes</a>
+      <button
+        id="closeModal"
+        class="btn"
+        onclick="document.getElementById('modalDelete').close();"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</dialog>

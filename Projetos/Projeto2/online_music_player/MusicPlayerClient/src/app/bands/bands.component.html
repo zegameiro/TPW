@@ -1,0 +1,47 @@
+<h1 class="margin ">List of Bands</h1>
+<hr />
+<div class="container_tp">
+  <div class="card w-96 bg-base-100 shadow-xl m-5" *ngFor="let band of bands">
+    <div >
+      <figure *ngIf="band.image">
+        <img [src]="BACKEND_URL + band.image" class="object-right-top object-cover h-60 h-full w-full rounded-tr-xl rounded-tl-xl"  alt="1" />
+      </figure>
+    </div>
+    <div class=" card-body w-96">
+      <span class="card-title"> <a routerLink="/artistDetails/{{ band.id }}"> {{ band.name }}</a></span>
+      <div class="card-actions justify-end ">
+        <a class="btn btn-outline mr-2" routerLink="/editBand/{{ band.id }}"
+        >Edit</a
+        >
+        <button
+          class="btn btn-outline btn-error"
+          onclick="document.getElementById('modalDelete').show()"
+          (click)="currentBandName = band.name; currentBandId = band.id"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<dialog id="modalDelete" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Delete Band!</h3>
+    <p class="py-4">
+      Are you sure you want to delete the band <b>{{currentBandName}}</b>?
+    </p>
+    <p>This action cannot be undone.</p>
+    <div class="modal-action">
+      <input type="hidden" id="globalId" value="" />
+      <a class="btn btn-error" id="deleteLink" (click)="deleteBand(currentBandId)">Yes</a>
+      <button
+        id="closeModal"
+        class="btn"
+        onclick="document.getElementById('modalDelete').close();"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</dialog>

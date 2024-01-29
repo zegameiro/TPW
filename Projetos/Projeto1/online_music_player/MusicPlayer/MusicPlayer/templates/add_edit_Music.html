@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+{% load i18n %} {% block content %} {% load static %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{% static 'css/addMusicPage.css' %}"
+/>
+<div class="">
+  <section is="add_edit_Music">
+    {% load crispy_forms_tags %}
+    <form action="" method="post" class="from-horizontal" enctype="multipart/form-data">
+      {% csrf_token %}
+      <h1 class="margin">{% if form.instance.id %}{% translate 'Edit Music' %}{% else %}{% translate 'Add Music' %}{% endif %}</h1>
+      <hr />
+      <div class="form-group">{{ form|crispy}}</div>
+      <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+          <input type="submit" value="Submit" class="btn-group" />
+        </div>
+      </div>
+    </form>
+  </section>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+  var select = $('#div_id_album').find('select');
+  select.empty();
+  select.append('<option value="" selected="selected">---------</option>');
+
+  $('#div_id_performer').change(function() {
+    var select = $('#div_id_album').find('select');
+    select.empty();
+    select.append('<option value="" selected="selected">---------</option>');
+
+    var performerName = $(this).find(':selected').text();
+    if (performerName) {
+      $.ajax({
+        url: "{% url 'getAlbumsByPerfomer' %}",
+        data: {
+            'performer_name': performerName
+        },
+        success: function(data) {
+          $.each(data, function(index, item) {
+            select.append('<option value="' + item.id + '">' + item.name + '</option>');
+          });
+        }
+      });
+    }
+  });
+});
+</script>
+{% endblock %}

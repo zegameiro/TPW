@@ -1,0 +1,47 @@
+<h1 class="margin ">List of Albums</h1>
+<hr />
+<div class="container_tp">
+  <div class="card w-96 bg-base-100 shadow-xl m-5" *ngFor="let album of albums">
+    <div >
+      <figure *ngIf="album.image">
+        <img [src]="BACKEND_URL + album.image" class="object-right-top object-cover h-60 h-full w-full rounded-tr-xl rounded-tl-xl"  alt="1" />
+      </figure>
+    </div>
+    <div class=" card-body w-96">
+      <span class="card-title"> {{ album.name }}</span>
+      <div class="card-actions justify-end ">
+        <a class="btn btn-outline mr-2" routerLink="/editAlbum/{{ album.id }}"
+        >Edit</a
+        >
+        <button
+          class="btn btn-outline btn-error"
+          onclick="document.getElementById('modalDelete').show()"
+          (click)="currentAlbumName = album.name; currentAlbumId = album.id"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<dialog id="modalDelete" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Delete Album!</h3>
+    <p class="py-4">
+      Are you sure you want to delete the Album <b>{{currentAlbumName}}</b>?
+    </p>
+    <p>This action cannot be undone.</p>
+    <div class="modal-action">
+      <input type="hidden" id="globalId" value="" />
+      <a class="btn btn-error" id="deleteLink" (click)="deleteAlbum(currentAlbumId)">Yes</a>
+      <button
+        id="closeModal"
+        class="btn"
+        onclick="document.getElementById('modalDelete').close();"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</dialog>

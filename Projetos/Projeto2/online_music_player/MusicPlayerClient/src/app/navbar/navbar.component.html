@@ -1,0 +1,60 @@
+<nav class="navbar_tp">
+  <ul class="navbar-nav_tp">
+    <li class="logo_tp">
+      <a class="nav-link_tp" routerLink="">
+        <img src="assets/images/logo.png" />
+        <span class="link-text_tp">Music Streaming</span>
+      </a>
+    </li>
+    <li class="nav-item_tp">
+      <a class="nav-link_tp" routerLink="">
+        <img src="assets/images/home.jpeg" alt="Home" />
+        <span class="link-text_tp">Home</span>
+      </a>
+    </li>
+    <li class="nav-item_tp">
+      <a class="nav-link_tp" routerLink="/about-us">
+        <img src="assets/images/aboutus.jpeg" alt="About us" />
+        <span class="link-text_tp">About Us</span>
+      </a>
+    </li>
+    <li class="nav-item_tp">
+      <a class="nav-link_tp" routerLink="/playlists">
+        <img src="../../assets/images/musicQueue.jpg" alt="Playlists" />
+        <span class="link-text_tp">Playlists</span>
+      </a>
+    </li>
+    <li class="nav-item_tp">
+      <a class="nav-link_tp" routerLink="/queue">
+        <img src="assets/images/headphones.jpeg" alt="Song Queue" />
+        <span class="link-text_tp">Song Queue</span>
+      </a>
+    </li>
+    <li class="nav-item_tp" *ngIf="authService.isSuperUser">
+      <a class="nav-link_tp" routerLink="/admin">
+        <img
+          src="assets/images/admin.png"
+          alt="Administrator Panel"
+        />
+        <span class="link-text_tp"
+        >Administrator Panel</span
+        >
+      </a>
+    </li>
+    <li class="nav-item_tp" *ngIf="authService.isLoggedIn else login">
+      <a class="nav-link_tp" (click)="signout()" style="cursor: pointer">
+        <img src="assets/images/user.jpeg" alt="Log Out" />
+        <span class="link-text_tp">Log out</span>
+      </a>
+    </li>
+    <ng-template #login>
+      <li class="nav-item_tp">
+        <a class="nav-link_tp" routerLink="/auth">
+          <img src="assets/images/user.jpeg" alt="Rating & Review" />
+          <span class="link-text_tp">Log in</span>
+        </a>
+      </li>
+    </ng-template>
+  </ul>
+</nav>
+
