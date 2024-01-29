@@ -1,0 +1,9 @@
+{% block bookdetails %}
+
+<h2>{{book.title}} details</h2>
+
+<p><b>Date:</b> {{book.date}}</p>
+<p><b>Author:</b> {{book.authors.all|join:", "}}</p>
+<p><b>Publisher:</b> {{book.publisher.name}}</p>
+
+{% endblock bookdetails %}

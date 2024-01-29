@@ -1,0 +1,13 @@
+{% block publisherlist %}
+
+<h2>List of Publishers</h2>
+
+<ul>
+    {% for publisher in publishers %}
+        <li>
+            <a href="{% url 'publisherdetails' publisher.name %}">{{ publisher.name }}</a> - <a href="{% url 'publisherauthors' publisher.name %}">Authors</a>
+        </li>
+    {% endfor %}
+</ul>
+
+{% endblock publisherlist %}

@@ -1,0 +1,22 @@
+{% block publisherslist %}
+
+<p>Search by: <strong>{{ query }}</strong></p>
+{% if publishers %}
+    <p>Found {{ publishers|length }} publisher{{ publishers|pluralize }}</p>
+
+    <ul>
+        {% for publisher in publishers %}
+            <li> <strong>Publisher {{ publisher.name }}</strong></li>
+            <ul>
+                <li>{{ publisher.city }}</li>
+                <li>{{ publisher.country }}</li>
+                <li>{{ publisher.website }}</li>
+                <li><a href="{% url 'publisherbooks' publisher.name %}">Books</a></li>
+            </ul>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Not found any results</p>
+{% endif %}
+
+{% endblock publisherslist %}

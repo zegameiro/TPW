@@ -1,0 +1,9 @@
+{% block authorbooks %}
+<h2>List of Books from {{ author }}</h2>
+<ul>
+    {% for book in books %}
+        <li><a href="{% url 'bookdetails' book.title %}">{{ book.title }}</a></li>
+        <br />
+    {% endfor %}
+</ul>
+{% endblock authorbooks %}

@@ -1,0 +1,12 @@
+{% block booklist %}
+
+<h2>List of books</h2>
+
+<ul>
+    {% for book in books %}
+        <li> <a href="{% url 'bookdetails' book.title %}">{{ book.title }}</a></li>
+        <br />
+    {% endfor %}
+</ul>
+
+{% endblock booklist %}

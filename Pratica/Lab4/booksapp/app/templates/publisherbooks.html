@@ -1,0 +1,9 @@
+{% block publisherbooks %}
+<h2>List of Books from {{ publisher }}</h2>
+<ul>
+    {% for book in books %}
+        <li><a href="{% url 'bookdetails' book.title %}">{{ book.title }}</a></li>
+        <br />
+    {% endfor %}
+</ul>
+{% endblock publisherbooks %}

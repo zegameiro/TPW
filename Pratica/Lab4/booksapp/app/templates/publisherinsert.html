@@ -1,0 +1,24 @@
+{% block publisherinsert %}
+
+<h2>Insert new Publisher</h2>
+
+{% if error %}
+
+    <h3>ERROR: Insert a valid publisher</h3>
+
+{% endif %}
+
+<form action="." method="post">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Name">
+    <br />
+    <input type="text" name="city" placeholder="City">
+    <br />
+    <input type="text" name="country" placeholder="Country">
+    <br />
+    <input type="url" name="website" placeholder="Website">
+    <br>
+    <input type="submit" name="Insert">
+</form>
+
+{% endblock %}

@@ -1,0 +1,13 @@
+{% block content %}
+
+{% if error %}
+    <p> ERROR: Insert a query term.</p>
+{% endif %}
+
+<form action="." method="post">
+    {% csrf_token %}
+    <input type="text" name="query">
+    <input type="submit" name="Search">
+</form>
+
+{% endblock %}

@@ -1,0 +1,12 @@
+{% block authorslist %}
+
+<h2>List of Authors</h2>
+
+<ul>
+    {% for author in authors %}
+        <li> <a href="{% url 'authordetails' author.name %}">{{ author.name }}</a> - <a href="{% url 'authorbooks' author.name %}">Livros</a></li>
+        <br />
+    {% endfor %}
+</ul>
+
+{% endblock authorslist %}
