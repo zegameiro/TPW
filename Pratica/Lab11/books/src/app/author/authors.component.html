@@ -1,0 +1,21 @@
+<h2>Authors</h2>
+<ul class="authors">
+    <li *ngFor="let author of authors" (click)="onSelect(author)">
+        <span class="badge">{{ author.num }}</span> {{ author.name }}
+    </li>
+</ul>
+
+<div *ngIf="selectedAuthor">
+    <h2>Information on {{ selectedAuthor.name | uppercase }}</h2>
+    <div><span>Num: </span>{{ selectedAuthor.num }}</div>
+    <div>
+        <label> Name:
+            <input [(ngModel)]="selectedAuthor.name" placeholder="name"/>
+        </label>
+    </div>
+    <div>
+        <label> Email:
+            <input [(ngModel)]="selectedAuthor.email" placeholder="email" />
+        </label>
+    </div>
+</div>

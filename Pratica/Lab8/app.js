@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var cat_1 = require("./cat");
+var dog_1 = require("./dog");
+var cat = new cat_1.Cat('Casa', 'Siamês', 'Barto');
+var ct = cat.talk();
+console.log(ct);
+var dog = new dog_1.Dog('Casa', 'Rafeiro');
+var dt = dog.talk();
+console.log(dt);
